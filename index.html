@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AdminFlow | Dashboard Administrativo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #e9eff7 0%, #dbe4f0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== BARRA DE NAVEGAÇÃO DINÂMICA ===== */
+        .navbar {
+            background: rgba(15, 25, 45, 0.85);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, #A3C6FF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, #FFD966, #FF9F4A);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.7rem 1.5rem;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            color: #f0f4fa;
+            backdrop-filter: blur(4px);
+        }
+
+        .nav-btn.active {
+            background: #ffffff22;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            color: white;
+            border-bottom: 2px solid #FFB347;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.25);
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== CONTAINER PRINCIPAL COM TRANSIÇÃO ===== */
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            flex: 1;
+        }
+
+        .page {
+            display: none;
+            animation: fadeSlideUp 0.5s ease-out forwards;
+        }
+
+        .page.active-page {
+            display: block;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== HOME - BLOCOS COMPLEXOS E CARDS ===== */
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card-bloco {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            overflow: hidden;
+        }
+
+        .card-bloco:hover {
+            transform: scale(1.02) translateY(-8px);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 40px -12px rgba(0, 0, 0, 0.3);
+            border-color: #FFB347;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 1.2rem;
+            margin-bottom: 1rem;
+            transition: transform 0.5s;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+        }
+
+        .card-bloco:hover .card-img {
+            transform: scale(1.02);
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #1F2A44, #2C3E66);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 0.5rem 0;
+        }
+
+        .card-text {
+            color: #2c3e44;
+            font-weight: 500;
+            margin: 0.8rem 0;
+        }
+
+        .btn-dinamico {
+            background: linear-gradient(95deg, #1e2b3c, #2c3e50);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.8rem 1.8rem;
+            border-radius: 40px;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .btn-dinamico:hover {
+            background: linear-gradient(95deg, #FF9F4A, #FF7B2C);
+            transform: scale(0.97);
+            box-shadow: 0 8px 18px rgba(255, 123, 44, 0.3);
+            letter-spacing: 1px;
+        }
+
+        /* estatísticas interativas */
+        .stats-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            border-radius: 1.5rem;
+            padding: 1.8rem;
+            text-align: center;
+            color: white;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,240,0.3);
+        }
+
+        .stat-card:hover {
+            background: #FF9F4Aaa;
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            display: block;
+        }
+
+        /* ===== PÁGINA CONTATO - FORM E INFOS ===== */
+        .contact-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 2.5rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .contact-info {
+            background: rgba(25, 35, 55, 0.7);
+            border-radius: 1.8rem;
+            padding: 1.8rem;
+            color: #f0f3f8;
+        }
+
+        .contact-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-details p {
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1f2a3e;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 1rem;
+            border: 1px solid #ccc;
+            background: #fffef7;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: #FF9F4A;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 159, 74, 0.3);
+            transform: scale(1.01);
+        }
+
+        .submit-btn {
+            background: linear-gradient(145deg, #2c3e50, #1f2a44);
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            font-weight: bold;
+            border-radius: 60px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 1rem;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(145deg, #FF9F4A, #ff7b2c);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .toast-msg {
+            background: #2e7d32;
+            color: white;
+            padding: 0.7rem;
+            border-radius: 50px;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; } to { opacity: 1; }
+        }
+
+        /* rodapé */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+            color: #eee;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 800px) {
+            .contact-wrapper {
+                grid-template-columns: 1fr;
+            }
+            .navbar {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            .main-container {
+                padding: 1rem;
+            }
+        }
+
+        /* botão de ação extra flutuante */
+        .floating-action {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #FF9F4A;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 18px black;
+            transition: 0.2s;
+            border: none;
+            font-size: 1.8rem;
+            color: white;
+            z-index: 1050;
+        }
+
+        .floating-action:hover {
+            transform: rotate(15deg) scale(1.1);
+            background: #ff7b2c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">Admin<span>Flow</span> · Painel</div>
+    <ul class="nav-links">
+        <li><button class="nav-btn active" data-page="home">🏠 Início</button></li>
+        <li><button class="nav-btn" data-page="contact">📞 Contato</button></li>
+    </ul>
+</div>
+
+<div class="main-container">
+    <!-- PÁGINA HOME -->
+    <div id="home-page" class="page active-page">
+        <!-- Blocos dinâmicos com imagens online e botões -->
+        <div class="hero-grid">
+            <div class="card-bloco">
+                <img class="card-img" src="https://picsum.photos/id/20/400/250" alt="Gestão Administrativa" loading="lazy">
+                <div class="card-title">Dashboard Analytics</div>
+                <div class="card-text">Métricas avançadas de desempenho, relatórios em tempo real e insights estratégicos.</div>
+                <button class="btn-dinamico" id="exploreAnalytics">📊 Explorar Agora →</button>
+            </div>
+            <div class="card-bloco">
+                <img class="card-img" src="https://picsum.photos/id/26/400/250" alt="Equipe Colaborativa" loading="lazy">
+                <div class="card-title">Gestão de Equipes</div>
+                <div class="card-text">Organize times, permissões, comunicação centralizada e muito mais.</div>
+                <button class="btn-dinamico" id="teamManageBtn">👥 Gerenciar Equipe</button>
+            </div>
+            <div class="card-bloco">
+                <img class="card-img" src="https://picsum.photos/id/0/400/250" alt="Finanças & Controle" loading="lazy">
+                <div class="card-title">Finanças Corporativas</div>
+                <div class="card-text">Fluxo de caixa, despesas, orçamentos e painel financeiro inteligente.</div>
+                <button class="btn-dinamico" id="financeBtn">💰 Detalhes Financeiros</button>
+            </div>
+        </div>
+
+        <!-- Bloco estatístico interativo (JavaScript dinâmico) -->
+        <div class="stats-section">
+            <div class="stat-card" id="statUsuarios">
+                <span class="stat-number" id="userCount">1,284</span>
+                <span>Usuários Ativos</span>
+            </div>
+            <div class="stat-card" id="statVendas">
+                <span class="stat-number" id="salesCount">R$ 97.5K</span>
+                <span>Receita Mensal</span>
+            </div>
+            <div class="stat-card" id="statTickets">
+                <span class="stat-number" id="ticketCount">43</span>
+                <span>Tickets Abertos</span>
+            </div>
+        </div>
+        <p style="text-align:center; margin-top: 1rem; font-size:0.8rem; opacity:0.6;">✨ Clique nos cards estatísticos para simular atualização</p>
+    </div>
+
+    <!-- PÁGINA CONTATO -->
+    <div id="contact-page" class="page">
+        <div class="contact-wrapper">
+            <div class="contact-info">
+                <h3>📬 Central de Administração</h3>
+                <p>Entre em contato com nossa equipe de suporte administrativo. Respondemos em até 2h úteis.</p>
+                <div class="contact-details">
+                    <p>📧 admin@adminflow.com</p>
+                    <p>📞 +55 (11) 98765-4321</p>
+                    <p>📍 Av. Paulista, 1000 - São Paulo, SP</p>
+                </div>
+                <div style="margin-top: 2rem; background: #00000030; border-radius: 1rem; padding: 1rem;">
+                    <strong>🗓️ Horário administrativo:</strong><br>
+                    Seg-Sex: 8h às 18h | Suporte 24h online
+                </div>
+            </div>
+            <div class="contact-form">
+                <h3 style="color:#1f2a44;">Envie sua mensagem</h3>
+                <form id="adminContactForm">
+                    <div class="form-group">
+                        <label>Nome completo</label>
+                        <input type="text" id="contactName" placeholder="Ex: João Silva" required>
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail corporativo</label>
+                        <input type="email" id="contactEmail" placeholder="joao@empresa.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Assunto</label>
+                        <input type="text" id="contactSubject" placeholder="Gestão / Suporte / Feedback" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mensagem</label>
+                        <textarea rows="4" id="contactMsg" placeholder="Detalhe sua solicitação..." required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">📨 Enviar mensagem</button>
+                    <div id="formFeedback" class="toast-msg"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p>AdminFlow · Soluções administrativas inteligentes · © 2025</p>
+</div>
+
+<!-- Botão flutuante dinâmico: exibe alerta de notificação -->
+<button class="floating-action" id="floatNotifyBtn">⚡</button>
+
+<script>
+    // ---------- Controle de navegação entre páginas ----------
+    const pages = {
+        home: document.getElementById('home-page'),
+        contact: document.getElementById('contact-page')
+    };
+    const navBtns = document.querySelectorAll('.nav-btn');
+
+    function switchPage(pageId) {
+        // esconde todas
+        Object.values(pages).forEach(page => {
+            if(page) page.classList.remove('active-page');
+        });
+        if(pageId === 'home') pages.home.classList.add('active-page');
+        if(pageId === 'contact') pages.contact.classList.add('active-page');
+        
+        // atualizar classe active nos botões
+        navBtns.forEach(btn => {
+            btn.classList.remove('active');
+            if((pageId === 'home' && btn.getAttribute('data-page') === 'home') ||
+               (pageId === 'contact' && btn.getAttribute('data-page') === 'contact')) {
+                btn.classList.add('active');
+            }
+        });
+    }
+
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const page = btn.getAttribute('data-page');
+            if(page === 'home') switchPage('home');
+            else if(page === 'contact') switchPage('contact');
+        });
+    });
+
+    // ---------- Botões DINÂMICOS na HOME ----------
+    // 1) Botão de analytics
+    document.getElementById('exploreAnalytics')?.addEventListener('click', () => {
+        showDynamicToast("📈 Abrindo Dashboard de Analytics... (demo)");
+        // simular mudança em números de estatística
+        updateRandomStat();
+    });
+    document.getElementById('teamManageBtn')?.addEventListener('click', () => {
+        showDynamicToast("👥 Abrindo módulo de Gestão de Equipes - Funções e permissões");
+        updateRandomStat();
+    });
+    document.getElementById('financeBtn')?.addEventListener('click', () => {
+        showDynamicToast("💰 Painel Financeiro: relatório de fluxo de caixa simulado");
+        updateRandomStat();
+    });
+    
+    // Função auxiliar para toast flutuante pequeno
+    function showDynamicToast(message, duration = 2500) {
+        // criar um elemento toast temporário
+        const toast = document.createElement('div');
+        toast.innerText = message;
+        toast.style.position = 'fixed';
+        toast.style.bottom = '90px';
+        toast.style.right = '20px';
+        toast.style.backgroundColor = '#1e2b3cee';
+        toast.style.color = 'white';
+        toast.style.padding = '12px 24px';
+        toast.style.borderRadius = '40px';
+        toast.style.fontWeight = 'bold';
+        toast.style.backdropFilter = 'blur(12px)';
+        toast.style.zIndex = '2000';
+        toast.style.boxShadow = '0 6px 14px black';
+        toast.style.borderLeft = '5px solid #FF9F4A';
+        toast.style.fontSize = '0.9rem';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+    
+    // Atualiza estatísticas randômicas para demonstrar dinamismo
+    function updateRandomStat() {
+        const userCountSpan = document.getElementById('userCount');
+        const salesCountSpan = document.getElementById('salesCount');
+        const ticketCountSpan = document.getElementById('ticketCount');
+        if(userCountSpan) {
+            let currentUsers = parseInt(userCountSpan.innerText.replace(',', ''));
+            if(isNaN(currentUsers)) currentUsers = 1284;
+            let newUsers = currentUsers + Math.floor(Math.random() * 35) - 5;
+            newUsers = Math.max(850, newUsers);
+            userCountSpan.innerText = newUsers.toLocaleString();
+        }
+        if(salesCountSpan) {
+            let currentSalesStr = salesCountSpan.innerText;
+            let numeric = parseFloat(currentSalesStr.replace('R$ ', '').replace('K', '')) * 1000;
+            if(isNaN(numeric)) numeric = 97500;
+            let delta = (Math.random() * 8000) - 2000;
+            let newSales = numeric + delta;
+            newSales = Math.max(45000, Math.min(180000, newSales));
+            salesCountSpan.innerText = `R$ ${(newSales/1000).toFixed(1)}K`;
+        }
+        if(ticketCountSpan) {
+            let currentTickets = parseInt(ticketCountSpan.innerText);
+            if(isNaN(currentTickets)) currentTickets = 43;
+            let newTickets = currentTickets + Math.floor(Math.random() * 11) - 4;
+            newTickets = Math.max(12, newTickets);
+            ticketCountSpan.innerText = newTickets;
+        }
+        showDynamicToast("📊 Atualização automática: estatísticas recalculadas!");
+    }
+    
+    // Adicionar eventos de clique aos cards de estatísticas
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            updateRandomStat();
+            showDynamicToast(`🔁 Estatística "${card.querySelector('span:last-child')?.innerText || 'indicador'}" atualizada dinamicamente`);
+        });
+    });
+    
+    // ---------- Formulário de Contato com validação e JS dinâmico ----------
+    const contactForm = document.getElementById('adminContactForm');
+    const feedbackDiv = document.getElementById('formFeedback');
+    
+    if(contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('contactName')?.value.trim();
+            const email = document.getElementById('contactEmail')?.value.trim();
+            const subject = document.getElementById('contactSubject')?.value.trim();
+            const message = document.getElementById('contactMsg')?.value.trim();
+            
+            if(!name || !email || !subject || !message) {
+                showFormFeedback("⚠️ Preencha todos os campos!", "#c62828");
+                return;
+            }
+            if(!email.includes('@') || !email.includes('.')) {
+                showFormFeedback("📧 Digite um e-mail válido!", "#c62828");
+                return;
+            }
+            // simular envio para administração
+            showFormFeedback(`✅ Mensagem enviada com sucesso! Obrigado ${name}, em breve retornaremos.`, "#2e7d32");
+            contactForm.reset();
+            // opcional: também dispara toast flutuante
+            showDynamicToast(`📨 Mensagem de ${name} registrada na central administrativa.`);
+        });
+    }
+    
+    function showFormFeedback(msg, bgColor) {
+        if(feedbackDiv) {
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.style.backgroundColor = bgColor;
+            feedbackDiv.innerText = msg;
+            setTimeout(() => {
+                feedbackDiv.style.display = 'none';
+            }, 4000);
+        }
+    }
+    
+    // Botão flutuante super dinâmico
+    const floatBtn = document.getElementById('floatNotifyBtn');
+    if(floatBtn) {
+        floatBtn.addEventListener('click', () => {
+            // ação complexa: gerar alerta personalizado com painel de administração
+            const randomAction = Math.floor(Math.random() * 4);
+            switch(randomAction) {
+                case 0:
+                    showDynamicToast("✨ Nova notificação: Sistema atualizado para versão 2.4.0");
+                    break;
+                case 1:
+                    showDynamicToast("📅 Reunião administrativa agendada para amanhã 10h");
+                    break;
+                case 2:
+                    showDynamicToast("⚙️ Manutenção preventiva agendada para domingo 02:00");
+                    break;
+                case 3:
+                    showDynamicToast("🏆 Você tem 2 relatórios semanais pendentes!");
+                    break;
+                default:
+                    showDynamicToast("🔔 Lembrete: revise os indicadores do mês");
+            }
+            // Também pisca um efeito na navbar
+            const navbar = document.querySelector('.navbar');
+            if(navbar) {
+                navbar.style.transition = "0.2s";
+                navbar.style.backgroundColor = "#FF9F4Aaa";
+                setTimeout(() => navbar.style.backgroundColor = "", 300);
+            }
+        });
+    }
+    
+    // Inicialização adicional: simular "boas vindas" no console e pequeno efeito
+    console.log("✅ AdminFlow ativo — interface complexa com blocos dinâmicos e gestão de contato");
+
+    // Forçar que os links internos não quebrem caso haja erro
+    window.addEventListener('load', () => {
+        // pequena verificação de imagens alternativas, caso alguma imagem online falhe, não quebra layout bonito
+        document.querySelectorAll('.card-img').forEach(img => {
+            img.addEventListener('error', () => {
+                img.src = "https://picsum.photos/id/42/400/250";
+            });
+        });
+        // textinho interativo
+        showDynamicToast("👋 Bem-vindo ao painel administrativo | Use os cards e estatísticas!", 3500);
+    });
+    
+    // Efeito adicional: animação nos botões dinâmicos (já tem hover, mas adicionar micro interação)
+    const allDynamicBtns = document.querySelectorAll('.btn-dinamico, .submit-btn, .floating-action');
+    allDynamicBtns.forEach(btn => {
+        btn.addEventListener('mousedown', () => {
+            btn.style.transform = 'scale(0.97)';
+            setTimeout(() => { if(btn) btn.style.transform = ''; }, 120);
+        });
+    });
+    
+    // Opcional: responsividade dinâmica + ao clicar no logo, voltar para home
+    const logoDiv = document.querySelector('.logo');
+    if(logoDiv) {
+        logoDiv.style.cursor = 'pointer';
+        logoDiv.addEventListener('click', () => {
+            switchPage('home');
+            showDynamicToast("🏠 Retornando ao Dashboard principal");
+        });
+    }
+</script>
+</body>
+</html>
